@@ -38,6 +38,10 @@ class ClimaViewModel(
                     temperatura = clima.main.temp,
                     descripcion = clima.weather.first().description,
                     st = clima.main.feels_like,
+                    //campos que agregue en climaEstado
+                    tempMin = clima.main.temp_min,
+                    tempMax = clima.main.temp_max,
+                    humedad = clima.main.humidity,
                 )
             } catch (exception: Exception){
                 uiState = ClimaEstado.Error(exception.localizedMessage ?: "error desconocido")
