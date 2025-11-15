@@ -6,7 +6,10 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,11 +33,15 @@ fun CiudadesPage(
         )
     )
 
+    var ubicando by remember { mutableStateOf(false) }
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
             if (granted) {
+                ubicando = true
                 obtenerUbicacion(fusedLocationClient) { lat, lon ->
+                    ubicando = false
                     val ruta = Ruta.Clima(
                         lat = lat.toFloat(),
                         lon = lon.toFloat(),
@@ -48,6 +55,7 @@ fun CiudadesPage(
 
     CiudadesView(
         state = viewModel.uiState,
+        ubicando = ubicando,
         onAction = { intencion ->
             when (intencion) {
                 CiudadesIntencion.MiUbicacion -> {
@@ -58,7 +66,9 @@ fun CiudadesPage(
                             context,
                             permiso
                         ) == PackageManager.PERMISSION_GRANTED -> {
+                            ubicando = true
                             obtenerUbicacion(fusedLocationClient) { lat, lon ->
+                                ubicando = false
                                 val ruta = Ruta.Clima(
                                     lat = lat.toFloat(),
                                     lon = lon.toFloat(),
@@ -103,4 +113,3 @@ private fun obtenerUbicacion(
         android.os.Looper.getMainLooper()
     )
 }
-

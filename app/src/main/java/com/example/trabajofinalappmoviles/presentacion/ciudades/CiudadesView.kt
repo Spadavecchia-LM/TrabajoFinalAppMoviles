@@ -1,5 +1,6 @@
 package com.example.trabajofinalappmoviles.presentacion.ciudades
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.trabajofinalappmoviles.repository.modelos.Ciudad
 import kotlinx.coroutines.delay
 
@@ -43,62 +45,92 @@ import kotlinx.coroutines.delay
 fun CiudadesView (
     modifier: Modifier = Modifier,
     state : CiudadesEstado,
+    ubicando: Boolean,
     onAction: (CiudadesIntencion)->Unit
 ) {
     var value by rememberSaveable{ mutableStateOf("") }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Open Istea Weather App") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        },
-        modifier = modifier
-    ) { paddingValues ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Ingrese nombre de ciudad",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+    Box(modifier = modifier.fillMaxSize()) {
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Open Istea Weather App") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                },
-                value = value,
-                onValueChange = {
-                    value = it
-                    onAction(CiudadesIntencion.Buscar(value))
-                },
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
+                )
+            },
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                onClick = { onAction(CiudadesIntencion.MiUbicacion) }
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                Text(text = "Usar mi ubicación actual")
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Ingrese nombre de ciudad",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Gray
+                        )
+                    },
+                    value = value,
+                    onValueChange = {
+                        value = it
+                        onAction(CiudadesIntencion.Buscar(value))
+                    },
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    enabled = !ubicando,
+                    onClick = { onAction(CiudadesIntencion.MiUbicacion) }
+                ) {
+                    Text(text = "Usar mi ubicación actual")
+                }
+                when (state) {
+                    CiudadesEstado.Cargando -> CargandoLista()
+                    CiudadesEstado.Inicial -> ListaInicial()
+                    is CiudadesEstado.Error -> ErrorView(value = state.mensaje)
+                    is CiudadesEstado.Resultado -> ListaDeCiudades(state.ciudades) {
+                        onAction(
+                            CiudadesIntencion.Seleccionar(it)
+                        )
+                    }
+                    CiudadesEstado.Vacio -> ListaVacia(value = value)
+                }
             }
-            when (state) {
-                CiudadesEstado.Cargando -> CargandoLista()
-                CiudadesEstado.Inicial -> ListaInicial()
-                is CiudadesEstado.Error -> ErrorView(value = state.mensaje)
-                is CiudadesEstado.Resultado -> ListaDeCiudades(state.ciudades) {
-                    onAction(
-                        CiudadesIntencion.Seleccionar(it)
+        }
+
+        if (ubicando) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        strokeWidth = 4.dp,
+                        modifier = Modifier.height(60.dp)
+                    )
+                    Text(
+                        text = "Obteniendo ubicación...",
+                        color = Color.White,
+                        fontSize = 16.sp
                     )
                 }
-                CiudadesEstado.Vacio -> ListaVacia(value = value)
             }
         }
     }
@@ -187,7 +219,7 @@ fun ListaInicial() {
             Text(
                 "Busca una ciudad",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.typography.bodyMedium.color
             )
             Text(
                 "Escribe el nombre de una ciudad para ver su clima",
