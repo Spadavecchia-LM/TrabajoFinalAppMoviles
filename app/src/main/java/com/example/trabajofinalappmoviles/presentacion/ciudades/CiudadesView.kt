@@ -1,62 +1,224 @@
 package com.example.trabajofinalappmoviles.presentacion.ciudades
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.example.trabajofinalappmoviles.repository.modelos.Ciudad
+import kotlinx.coroutines.delay
 
 
 //aca se crea la vista de la lista de ciudades
 //editar los composable a gusto segun lo que queremos que se vea
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CiudadesView (
     modifier: Modifier = Modifier,
     state : CiudadesEstado,
     onAction: (CiudadesIntencion)->Unit
 ) {
-    var value by remember{ mutableStateOf("") }
+    var value by rememberSaveable{ mutableStateOf("") }
 
-    Column(modifier = modifier) {
-        TextField(
-            value = value,
-            label = {  "buscar por nombre" },
-            onValueChange = {
-                value = it
-                onAction(CiudadesIntencion.Buscar(value))
-            },
-        )
-        when(state) {
-            CiudadesEstado.Cargando -> Text(text = "cargando")
-            is CiudadesEstado.Error -> Text(text = state.mensaje)
-            is CiudadesEstado.Resultado -> ListaDeCiudades(state.ciudades) {
-                onAction(
-                    CiudadesIntencion.Seleccionar(it)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Open Istea Weather App") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+            )
+        },
+        modifier = modifier
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Ingrese nombre de ciudad",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
+                },
+                value = value,
+                onValueChange = {
+                    value = it
+                    onAction(CiudadesIntencion.Buscar(value))
+                },
+            )
+            when (state) {
+                CiudadesEstado.Cargando -> CargandoLista()
+                is CiudadesEstado.Error -> Text(text = state.mensaje)
+                is CiudadesEstado.Resultado -> ListaDeCiudades(state.ciudades) {
+                    onAction(
+                        CiudadesIntencion.Seleccionar(it)
+                    )
+                }
+                CiudadesEstado.Vacio -> ListaVacia()
             }
-            CiudadesEstado.Vacio -> Text(text = "No hay resultados")
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaDeCiudades(ciudades: List<Ciudad>, onSelect: (Ciudad)->Unit) {
-    LazyColumn {
-        items(items = ciudades) {
-            Card(onClick = { onSelect(it) }) {
-                Text(text = it.name)
+fun ListaDeCiudades(ciudades: List<Ciudad>, onSelect: (Ciudad) -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(20.dp)
+    ) {
+        items(items = ciudades) { ciudad ->
+            Card(
+                onClick = { onSelect(ciudad) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        "📍",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = ciudad.name,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        if (!ciudad.country.isNullOrEmpty()) {
+                            Text(
+                                text = ciudad.country,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        if (!ciudad.state.isNullOrEmpty()) {
+                            Text(
+                                text = ciudad.state,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                    Text(
+                        "➡️",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun ListaVacia() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                "🏙️",
+                style = MaterialTheme.typography.displayLarge
+            )
+            Text(
+                "Busca una ciudad",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                "Escribe el nombre de una ciudad para ver su clima",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun CargandoLista() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        var dotState by remember { mutableStateOf(0) }
+
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(500)
+                dotState = (dotState + 1) % 4
+            }
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Buscando${".".repeat(dotState)}",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
