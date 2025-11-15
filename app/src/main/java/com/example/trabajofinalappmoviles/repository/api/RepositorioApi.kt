@@ -41,7 +41,7 @@ class RepositorioApi : Repositorio{
             val ciudades = respuesta.body<List<Ciudad>>()
             return ciudades
         }else{
-            throw Exception()
+            throw Exception("Error al buscar ciudad desde la API")
         }
     }
 

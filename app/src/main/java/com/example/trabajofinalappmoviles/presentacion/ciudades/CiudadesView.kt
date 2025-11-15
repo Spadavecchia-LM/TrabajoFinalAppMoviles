@@ -37,10 +37,6 @@ import androidx.compose.ui.unit.dp
 import com.example.trabajofinalappmoviles.repository.modelos.Ciudad
 import kotlinx.coroutines.delay
 
-
-//aca se crea la vista de la lista de ciudades
-//editar los composable a gusto segun lo que queremos que se vea
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CiudadesView (
@@ -85,13 +81,14 @@ fun CiudadesView (
             )
             when (state) {
                 CiudadesEstado.Cargando -> CargandoLista()
-                is CiudadesEstado.Error -> Text(text = state.mensaje)
+                CiudadesEstado.Inicial -> ListaInicial()
+                is CiudadesEstado.Error -> ErrorView(value = state.mensaje)
                 is CiudadesEstado.Resultado -> ListaDeCiudades(state.ciudades) {
                     onAction(
                         CiudadesIntencion.Seleccionar(it)
                     )
                 }
-                CiudadesEstado.Vacio -> ListaVacia()
+                CiudadesEstado.Vacio -> ListaVacia(value = value)
             }
         }
     }
@@ -112,7 +109,7 @@ fun ListaDeCiudades(ciudades: List<Ciudad>, onSelect: (Ciudad) -> Unit) {
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Row(
                     modifier = Modifier
@@ -162,9 +159,8 @@ fun ListaDeCiudades(ciudades: List<Ciudad>, onSelect: (Ciudad) -> Unit) {
         }
     }
 }
-
 @Composable
-fun ListaVacia() {
+fun ListaInicial() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -188,6 +184,41 @@ fun ListaVacia() {
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
+        }
+    }
+}
+
+@Composable
+fun ListaVacia(value: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                "🔍",
+                style = MaterialTheme.typography.displayLarge
+            )
+
+            Text(
+                "No encontramos ciudades con el nombre ${value}",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+
+            Text(
+                "💡 Verificá que el nombre esté bien escrito o probá con otra ciudad",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+
         }
     }
 }
@@ -219,6 +250,36 @@ fun CargandoLista() {
                 text = "Buscando${".".repeat(dotState)}",
                 style = MaterialTheme.typography.bodyLarge
             )
+        }
+    }
+}
+
+@Composable
+fun ErrorView(value: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "❌",
+                style = MaterialTheme.typography.displayLarge
+            )
+
+            Text(
+                "ERROR",
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Text(
+                text = "El mensaje del error es: ${value}",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center
+            )
+
         }
     }
 }

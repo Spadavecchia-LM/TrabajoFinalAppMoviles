@@ -18,7 +18,7 @@ class CiudadesViewModel(
     val router: Router
 ) : ViewModel()
 {
- var uiState by mutableStateOf<CiudadesEstado>(CiudadesEstado.Vacio)
+ var uiState by mutableStateOf<CiudadesEstado>(CiudadesEstado.Inicial)
  var ciudades : List<Ciudad> = emptyList()
 
 
@@ -32,6 +32,11 @@ class CiudadesViewModel(
 
     private fun buscar(nombre: String){
         uiState = CiudadesEstado.Cargando
+        if (nombre.isBlank()){
+            uiState = CiudadesEstado.Inicial
+            return
+        }
+        ciudades = emptyList()
         viewModelScope.launch {
             try {
                 ciudades = repositorio.buscarCiudad(nombre)
@@ -40,8 +45,8 @@ class CiudadesViewModel(
                 } else {
                     uiState = CiudadesEstado.Resultado(ciudades)
                 }
-            } catch (exeption: Exception){
-                uiState = CiudadesEstado.Error(exeption.message ?: "Error Desconocido")
+            } catch (exception: Exception){
+                uiState = CiudadesEstado.Error(exception.message ?: "Error Desconocido")
             }
         }
     }
