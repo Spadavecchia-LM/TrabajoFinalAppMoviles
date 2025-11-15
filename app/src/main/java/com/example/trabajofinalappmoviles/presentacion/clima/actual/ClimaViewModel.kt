@@ -23,6 +23,7 @@ class ClimaViewModel(
     fun ejecutar(intencion: ClimaIntencion){
         when(intencion){
             ClimaIntencion.actualizarClima -> traerClima()
+            ClimaIntencion.CompartirClima -> {}
         }
     }
 

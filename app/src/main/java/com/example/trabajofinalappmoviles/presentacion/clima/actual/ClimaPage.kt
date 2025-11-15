@@ -2,8 +2,11 @@ package com.example.trabajofinalappmoviles.presentacion.clima.actual
 
 import PronosticoViewModel
 import PronosticoViewModelFactory
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.trabajofinalappmoviles.presentacion.clima.pronostico.PronosticoView
@@ -34,11 +37,31 @@ fun ClimaPage(
         )
     )
 
+    val context = LocalContext.current
+
     Column {
         ClimaView(
             state = viewModel.uiState,
             onAction = { intencion ->
-                viewModel.ejecutar(intencion)
+                when (intencion) {
+                    ClimaIntencion.actualizarClima -> {
+                        viewModel.ejecutar(intencion)
+                    }
+                    ClimaIntencion.CompartirClima -> {
+                        val estado = viewModel.uiState
+                        val texto = when (estado) {
+                            is ClimaEstado.Exitoso ->
+                                "Clima en ${estado.ciudad}: ${estado.temperatura}°, ${estado.descripcion}, sensación térmica ${estado.st}°"
+                            is ClimaEstado.Error ->
+                                "No se pudo obtener el clima de $nombre: ${estado.mensaje}"
+                            ClimaEstado.Vacio ->
+                                "Clima en $nombre: aún no hay datos para mostrar."
+                            ClimaEstado.Cargando ->
+                                "Obteniendo el clima actual de $nombre..."
+                        }
+                        compartirClima(context, texto)
+                    }
+                }
             }
         )
         PronosticoView(
@@ -49,4 +72,14 @@ fun ClimaPage(
         )
     }
 
+}
+
+fun compartirClima(context: Context, texto: String) {
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, texto)
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, "Compartir clima")
+    context.startActivity(shareIntent)
 }
