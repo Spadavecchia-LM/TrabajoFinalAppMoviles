@@ -13,6 +13,8 @@ import com.example.trabajofinalappmoviles.router.Ruta
 @Composable
 fun MainPage() {
     val navHostController = rememberNavController()
+
+
     NavHost(
         navController = navHostController,
         startDestination = Ruta.Ciudades.id
