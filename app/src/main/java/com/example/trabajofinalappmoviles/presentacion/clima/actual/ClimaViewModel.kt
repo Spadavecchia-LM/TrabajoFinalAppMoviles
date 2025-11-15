@@ -32,8 +32,9 @@ class ClimaViewModel(
         viewModelScope.launch {
             try{
                 val clima = repositorio.obtenerClimaCiudad(lat = lat, lon = lon)
+
                 uiState = ClimaEstado.Exitoso(
-                    ciudad = clima.name ,
+                    ciudad = clima.name,
                     temperatura = clima.main.temp,
                     descripcion = clima.weather.first().description,
                     st = clima.main.feels_like,

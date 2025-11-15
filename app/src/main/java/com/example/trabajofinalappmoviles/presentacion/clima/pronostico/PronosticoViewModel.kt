@@ -13,7 +13,9 @@ import kotlinx.coroutines.launch
 class PronosticoViewModel(
     val repositorio: Repositorio,
     val router: Router,
-    val nombre: String
+    val nombre: String,
+    val lat: Float,
+    val lon: Float
 ) : ViewModel() {
 
     var uiState by mutableStateOf<PronosticoEstado>(PronosticoEstado.Vacio)
@@ -28,7 +30,7 @@ class PronosticoViewModel(
         uiState = PronosticoEstado.Cargando
         viewModelScope.launch {
             try{
-                val forecast = repositorio.obtenerPronosticoCiudad(nombre).filter {
+                val forecast = repositorio.obtenerPronosticoPorCoord(lat, lon).filter {
                     //TODO agregar logica de filtrado
                     true
                 }
@@ -45,11 +47,13 @@ class PronosticoViewModelFactory(
     private val repositorio: Repositorio,
     private val router: Router,
     private val nombre: String,
+    private val lat: Float,
+    private val lon: Float,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PronosticoViewModel::class.java)) {
-            return PronosticoViewModel(repositorio,router,nombre) as T
+            return PronosticoViewModel(repositorio,router,nombre,lat,lon) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

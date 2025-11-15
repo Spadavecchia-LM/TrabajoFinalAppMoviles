@@ -33,7 +33,9 @@ fun ClimaPage(
         factory = PronosticoViewModelFactory(
             repositorio = RepositorioApi(),
             router = Enrutador(navHostController),
-            nombre = nombre
+            nombre = nombre,
+            lat = lat,
+            lon = lon
         )
     )
 

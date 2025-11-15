@@ -13,7 +13,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-
 class RepositorioApi : Repositorio{
 
     private val apiKey = "b89b53e37ce53de43fd019ef83aab867"
@@ -63,6 +62,20 @@ class RepositorioApi : Repositorio{
         }
     }
 
+    override suspend fun obtenerClimaPorNombre(nombre: String): Clima {
+        val respuesta = cliente.get("https://api.openweathermap.org/data/2.5/weather"){
+            parameter("q",nombre)
+            parameter("units","metric")
+            parameter("appid",apiKey)
+        }
+        if (respuesta.status == HttpStatusCode.OK){
+            val clima = respuesta.body<Clima>()
+            return clima
+        }else{
+            throw Exception("Error al obtener clima por nombre desde la API")
+        }
+    }
+
     override suspend fun obtenerPronosticoCiudad(nombre: String): List<ListForecast> {
         val respuesta = cliente.get("https://api.openweathermap.org/data/2.5/forecast"){
             parameter("q",nombre)
@@ -78,5 +91,21 @@ class RepositorioApi : Repositorio{
 
     }
 
-
+    override suspend fun obtenerPronosticoPorCoord(
+        lat: Float,
+        lon: Float
+    ): List<ListForecast> {
+        val respuesta = cliente.get("https://api.openweathermap.org/data/2.5/forecast"){
+            parameter("lat",lat)
+            parameter("lon",lon)
+            parameter("units","metric")
+            parameter("appid",apiKey)
+        }
+        if (respuesta.status == HttpStatusCode.OK){
+            val forecast = respuesta.body<ForecastDTO>()
+            return forecast.list
+        }else{
+            throw Exception("Error al obtener pronostico por coordenadas desde la API")
+        }
+    }
 }

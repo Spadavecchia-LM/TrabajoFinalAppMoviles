@@ -18,15 +18,16 @@ class CiudadesViewModel(
     val router: Router
 ) : ViewModel()
 {
- var uiState by mutableStateOf<CiudadesEstado>(CiudadesEstado.Inicial)
- var ciudades : List<Ciudad> = emptyList()
-
+    var uiState by mutableStateOf<CiudadesEstado>(CiudadesEstado.Inicial)
+    var ciudades : List<Ciudad> = emptyList()
 
     fun ejecutar(intencion: CiudadesIntencion){
         when(intencion){
             is CiudadesIntencion.Buscar -> buscar(nombre = intencion.nombre)
             is CiudadesIntencion.Seleccionar -> seleccionar(ciudad = intencion.ciudad)
-
+            CiudadesIntencion.MiUbicacion -> {
+                // La lógica de ubicación se maneja en CiudadesPage
+            }
         }
     }
 
@@ -50,6 +51,7 @@ class CiudadesViewModel(
             }
         }
     }
+
     private fun seleccionar(ciudad: Ciudad){
         val ruta = Ruta.Clima(
             lat = ciudad.lat,
@@ -71,7 +73,4 @@ class CiudadesViewModel(
             throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
-
-
-
 }
