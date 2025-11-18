@@ -44,6 +44,7 @@ android {
 val ktor_version: String by project
 
 dependencies {
+    implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("androidx.navigation:navigation-compose:2.9.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3")
     implementation("io.ktor:ktor-client-android:${ktor_version}")
