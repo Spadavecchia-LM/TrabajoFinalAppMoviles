@@ -147,7 +147,7 @@ fun PronosticoContenido(climas:List<ListForecast>)
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = dia.label, style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "${dia.tempMin.roundToInt()}°", style = MaterialTheme.typography.bodyMedium)
+                    Text(text = "${(dia.tempMin.roundToInt() + dia.tempMax.roundToInt()) / 2}°", style = MaterialTheme.typography.bodyMedium)
                 }
 
             }
