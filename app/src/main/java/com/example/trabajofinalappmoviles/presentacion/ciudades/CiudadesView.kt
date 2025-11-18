@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -38,7 +40,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.trabajofinalappmoviles.repository.modelos.Ciudad
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import kotlinx.coroutines.delay
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -156,15 +163,17 @@ fun ListaDeCiudades(ciudades: List<Ciudad>, onSelect: (Ciudad) -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(18.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        "📍",
-                        style = MaterialTheme.typography.headlineMedium
+                    Icon(
+                        imageVector = Icons.Outlined.LocationOn,
+                        contentDescription = "Ubicación",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(34.dp)
                     )
-
+                    Spacer(modifier = Modifier.width(50.dp))
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
@@ -176,11 +185,22 @@ fun ListaDeCiudades(ciudades: List<Ciudad>, onSelect: (Ciudad) -> Unit) {
                         )
 
                         if (!ciudad.country.isNullOrEmpty()) {
-                            Text(
-                                text = ciudad.country,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+                            Row (
+                                verticalAlignment = Alignment.CenterVertically
+
+                            ){
+                                Text(
+                                    text = ciudad.country,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                AsyncImage(
+                                    model = "https://flagsapi.com/${ciudad.country}/flat/32.png",
+                                    contentDescription = "Bandera de ${ciudad.country}",
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
                         }
 
                         if (!ciudad.state.isNullOrEmpty()) {
@@ -191,11 +211,13 @@ fun ListaDeCiudades(ciudades: List<Ciudad>, onSelect: (Ciudad) -> Unit) {
                             )
                         }
                     }
-                    Text(
-                        "➡️",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                        contentDescription = "Ver clima",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(28.dp)
                     )
+
                 }
             }
         }

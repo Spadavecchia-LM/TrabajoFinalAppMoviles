@@ -10,6 +10,7 @@ import com.example.trabajofinalappmoviles.presentacion.ciudades.CiudadesPage
 import com.example.trabajofinalappmoviles.presentacion.clima.actual.ClimaPage
 import com.example.trabajofinalappmoviles.router.Ruta
 
+
 @Composable
 fun MainPage() {
     val navHostController = rememberNavController()
