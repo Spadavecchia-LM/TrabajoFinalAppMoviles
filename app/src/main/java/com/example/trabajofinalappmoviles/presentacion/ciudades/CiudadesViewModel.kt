@@ -15,7 +15,8 @@ import kotlinx.coroutines.launch
 //aca se manejan los estados de la pantalla de ciudades
 class CiudadesViewModel(
     val repositorio: Repositorio,
-    val router: Router
+    val router: Router,
+    private val preferencias: PreferenciasCiudad
 ) : ViewModel()
 {
     var uiState by mutableStateOf<CiudadesEstado>(CiudadesEstado.Inicial)
@@ -63,12 +64,13 @@ class CiudadesViewModel(
 
     class CiudadesViewModelFactory(
         private val repositorio: Repositorio,
-        private val router: Router
+        private val router: Router,
+        private val preferencias: PreferenciasCiudad
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(CiudadesViewModel::class.java)) {
-                return CiudadesViewModel(repositorio,router) as T
+                return CiudadesViewModel(repositorio,router, preferencias) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

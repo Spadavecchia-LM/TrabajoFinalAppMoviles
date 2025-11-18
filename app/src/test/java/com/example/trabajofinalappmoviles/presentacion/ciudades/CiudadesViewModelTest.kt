@@ -14,6 +14,7 @@ class CiudadesViewModelTest {
     private lateinit var viewModel: CiudadesViewModel
     private lateinit var repositorio: Repositorio
     private lateinit var router: Router
+    private lateinit var preferencias: PreferenciasCiudad
 
     private val dispatcher = StandardTestDispatcher()
 
@@ -23,7 +24,8 @@ class CiudadesViewModelTest {
 
         repositorio = mockk()
         router = mockk(relaxed = true)
-        viewModel = CiudadesViewModel(repositorio, router)
+        preferencias = mockk(relaxed = true)
+        viewModel = CiudadesViewModel(repositorio, router, preferencias)
     }
 
     @After

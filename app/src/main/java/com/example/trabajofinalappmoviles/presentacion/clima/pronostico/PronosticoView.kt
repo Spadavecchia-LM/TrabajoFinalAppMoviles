@@ -121,10 +121,10 @@ fun PronosticoContenido(climas:List<ListForecast>)
             ){
                 Text(
                     text = "Pronóstico del tiempo para los proximos dias",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 15.dp, vertical = 20.dp)
+                        .padding(horizontal = 15.dp, vertical = 10.dp)
                 )
             }
         }

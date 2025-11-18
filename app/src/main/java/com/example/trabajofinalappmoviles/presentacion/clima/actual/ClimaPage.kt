@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.trabajofinalappmoviles.presentacion.ciudades.PreferenciasCiudad
 import com.example.trabajofinalappmoviles.presentacion.clima.pronostico.PronosticoView
 import com.example.trabajofinalappmoviles.repository.api.RepositorioApi
 import com.example.trabajofinalappmoviles.router.Enrutador
@@ -18,7 +19,8 @@ fun ClimaPage(
     navHostController: NavHostController,
     lat : Float,
     lon : Float,
-    nombre: String
+    nombre: String,
+    preferencias: PreferenciasCiudad
 ){
     val viewModel : ClimaViewModel = viewModel(
         factory = ClimaViewModelFactory(
@@ -44,6 +46,10 @@ fun ClimaPage(
     Column {
         ClimaView(
             state = viewModel.uiState,
+            preferencias = preferencias,
+            nombreCiudad = nombre,
+            lat = lat,
+            lon = lon,
             onAction = { intencion ->
                 when (intencion) {
                     ClimaIntencion.actualizarClima -> {
@@ -64,7 +70,8 @@ fun ClimaPage(
                         compartirClima(context, texto)
                     }
                 }
-            }
+            },
+            navController = navHostController
         )
         PronosticoView(
             state = pronosticoViewModel.uiState,

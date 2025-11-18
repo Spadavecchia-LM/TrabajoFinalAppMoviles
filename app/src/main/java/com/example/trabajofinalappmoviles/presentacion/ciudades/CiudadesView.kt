@@ -43,6 +43,7 @@ import com.example.trabajofinalappmoviles.repository.modelos.Ciudad
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import kotlinx.coroutines.delay
 import coil.compose.AsyncImage
@@ -53,9 +54,13 @@ fun CiudadesView (
     modifier: Modifier = Modifier,
     state : CiudadesEstado,
     ubicando: Boolean,
+    preferencias: PreferenciasCiudad,
     onAction: (CiudadesIntencion)->Unit
 ) {
     var value by rememberSaveable{ mutableStateOf("") }
+    var ciudadFavorita by rememberSaveable {
+        mutableStateOf(preferencias.obtenerCiudad())
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
 
@@ -102,6 +107,24 @@ fun CiudadesView (
                 ) {
                     Text(text = "Usar mi ubicación actual")
                 }
+
+                if (ciudadFavorita != null) {
+                    val (nombre, lat, lon) = ciudadFavorita!!
+                    CiudadFavorita(
+                        nombre = nombre,
+                        lat = lat,
+                        lon = lon,
+                        onEliminar = {
+                            preferencias.eliminarCiudad()
+                            ciudadFavorita = null
+                        },
+                        onSeleccionar = {
+                            val ciudad = Ciudad(nombre, lat, lon, "")
+                            onAction(CiudadesIntencion.Seleccionar(ciudad))
+                        }
+                    )
+                }
+
                 when (state) {
                     CiudadesEstado.Cargando -> CargandoLista()
                     CiudadesEstado.Inicial -> ListaInicial()
@@ -141,6 +164,54 @@ fun CiudadesView (
             }
         }
     }
+}
+
+@Composable
+fun CiudadFavorita(
+    nombre: String,
+    lat: Float,
+    lon: Float,
+    onEliminar: () -> Unit,
+    onSeleccionar: () -> Unit
+) {
+    Spacer(modifier = Modifier.height(16.dp))
+    Row(
+        modifier = Modifier.padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "⭐ Ciudad Favorita",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Button(
+            onClick = onEliminar,
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+        ) {
+            Text("Eliminar", color = MaterialTheme.colorScheme.error)
+        }
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Card(
+        onClick = onSeleccionar,
+        modifier = Modifier.padding(horizontal = 20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Outlined.LocationOn, "Favorita", tint = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(nombre, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, "Ver clima")
+        }
+    }
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

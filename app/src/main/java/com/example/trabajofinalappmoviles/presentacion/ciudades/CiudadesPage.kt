@@ -21,7 +21,8 @@ import com.google.android.gms.location.LocationServices
 
 @Composable
 fun CiudadesPage(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    preferencias: PreferenciasCiudad
 ) {
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -29,7 +30,8 @@ fun CiudadesPage(
     val viewModel: CiudadesViewModel = viewModel(
         factory = CiudadesViewModel.CiudadesViewModelFactory(
             repositorio = RepositorioApi(),
-            router = Enrutador(navHostController)
+            router = Enrutador(navHostController),
+            preferencias = preferencias
         )
     )
 
@@ -56,6 +58,7 @@ fun CiudadesPage(
     CiudadesView(
         state = viewModel.uiState,
         ubicando = ubicando,
+        preferencias = preferencias,
         onAction = { intencion ->
             when (intencion) {
                 CiudadesIntencion.MiUbicacion -> {
