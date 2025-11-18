@@ -1,7 +1,5 @@
 package com.example.trabajofinalappmoviles.presentacion.clima.pronostico
 
-import android.R.attr.label
-import android.R.string.no
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -84,6 +82,7 @@ fun ErrorView(mensaje: String){
     Text(text = mensaje)
 }
 
+/*
 @Composable
 fun PronosticoView(climas: List<ListForecast>){
     LazyColumn {
@@ -94,6 +93,7 @@ fun PronosticoView(climas: List<ListForecast>){
         }
     }
 }
+*/
 
 @Composable
 fun PronosticoContenido(climas:List<ListForecast>)
